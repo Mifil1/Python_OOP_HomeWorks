@@ -60,30 +60,53 @@ class Pawn(Figure):
 class King(Figure):
     def is_possible_move(self, position: Tuple[int, int]) -> bool:
         super().is_possible_move(position)
-        return position[0] == self.get_x() + 1\
-            or position[1] == self.get_y() + 1
+        return abs(position[0] - self.get_x()) <= 1\
+            and abs(position[1] - self.get_y()) <= 1
+
+
+class Knight(Figure):
+    def is_possible_move(self, position: Tuple[int, int]) -> bool:
+        super().is_possible_move(position)
+        return abs(position[0] - self.get_x()) == 2\
+            and abs(position[1] - self.get_y()) == 1\
+            or abs(position[0] - self.get_x()) == 1\
+            and abs(position[1] - self.get_y()) == 2
+
+
+class Bishop(Figure):
+    def is_possible_move(self, position: Tuple[int, int]) -> bool:
+        super().is_possible_move(position)
+        return abs(position[0] - self.get_x())\
+            == abs(position[1] - self.get_y())
+
+
+class Rook(Figure):
+    def is_possible_move(self, position: Tuple[int, int]) -> bool:
+        super().is_possible_move(position)
+        return abs(position[0] - self.get_x()) == 0\
+            or abs(position[1] - self.get_y()) == 0
+
+
+class Queen(Rook, Bishop):
+    def is_possible_move(self, position: Tuple[int, int]) -> bool:
+        return Rook.is_possible_move(self, position)\
+            or Bishop.is_possible_move(self, position)
 
 
 if __name__ == "__main__":
-    p = Pawn((0, 0), True)
-    print(p.info() + "\n")
-    print(p.is_possible_move((2, 0)))
-    p.change_position((2, 0))
-    print(p.info() + "\n")
-    print(p.is_possible_move((2, 0)))
-    p.change_color()
-    print(p.info() + "\n")
-    print(p.is_possible_move((1, 0)))
 
-    k = King((0, 0), True)
-    print(k.info() + "\n")
-    print(k.is_possible_move((2, 1)))
-    k.change_position((1, 0))
-    print(k.info() + "\n")
-    print(k.is_possible_move((2, 0)))
-    k.change_color()
-    print(k.info() + "\n")
-    print(k.is_possible_move((1, 1)))
+    k = Queen((4, 4), True)
+    print(k.info())
+    while True:
+        x = int(input())
+        y = int(input())
+        if k.is_possible_move((x, y)):
+            k.change_position((x, y))
+            print("Go" + "\n")
+        else:
+            print("No" + "\n")
+        print(k.info() + "\n")
+
 
 
 
