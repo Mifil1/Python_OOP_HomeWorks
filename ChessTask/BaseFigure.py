@@ -19,6 +19,7 @@ class Figure:
     # if color = True - white else black
     _color: bool = True
 
+    #Construct
     def __init__(self, position: Tuple[int, int] = (0, 0), color: bool = True):
         self.__color = color
         if self.on_the_board(position):
@@ -28,6 +29,7 @@ class Figure:
         else:
             self.__x, self.__y = 7, 7
 
+    #metods get
     def get_x(self) -> int:
         return self.__x
 
@@ -43,6 +45,7 @@ class Figure:
         else:
             return "Black"
 
+    # other metods
     def change_color(self):
         self.__color = not self.__color
 
@@ -65,6 +68,13 @@ class Figure:
         return f"It`s {self.__class__} \nx = {self.__x} \ny = {self.__y} \n" \
                f"color = {self.color()}"
 
+    # magic metods (dander)
+    def __str__(self):
+        return f"{self.__class__} x = {self.__x} y = {self.__y} " \
+               f"{self.color()}"
+    def __repr__(self):
+        return f"{self.__class__} x = {self.__x} y = {self.__y} " \
+               f"{self.color()}"
 
 ###########################
 #       Кінець блоку      #

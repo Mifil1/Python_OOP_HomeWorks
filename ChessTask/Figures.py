@@ -92,24 +92,6 @@ class Queen(Rook, Bishop):
         return Rook.is_possible_move(self, position)\
             or Bishop.is_possible_move(self, position)
 
-
-if __name__ == "__main__":
-
-    k = Queen((4, 4), True)
-    print(k.info())
-    while True:
-        x = int(input())
-        y = int(input())
-        if k.is_possible_move((x, y)):
-            k.change_position((x, y))
-            print("Go" + "\n")
-        else:
-            print("No" + "\n")
-        print(k.info() + "\n")
-
-
-
-
 ###########################
 #       Кінець блоку      #
 #    реалізації класів    #
@@ -118,8 +100,14 @@ if __name__ == "__main__":
 ###########################
 # Блок реалізації функцій #
 ###########################
-def print_hello():
-    print("Hello")
+def checker(lst: list, pos: Tuple[int, int]):
+    temp_lst = []
+    for i in lst:
+        if not isinstance(i, Figure):
+            continue
+        if i.is_possible_move(pos):
+            temp_lst.append(i)
+    return temp_lst
 
 
 ###########################
@@ -130,9 +118,73 @@ def print_hello():
 #################################
 # Основний цикл роботи програми #
 #################################
-p = Pawn()
-p.is_possible_move((1, 1))
-p.change_position((1, 1))
+if __name__ == "__main__":
+
+    li_fig = [
+        Pawn((5, 4), 0),
+        King((3, 3)),
+        Bishop((0, 0)),
+        Rook((0, 4)),
+        Queen((4, 0)),
+        Pawn((0, 4), 1),
+        King((1, 3)),
+    ]
+    print(li_fig)
+    li_fig = checker(li_fig, (4, 4))
+    print(str(li_fig) + "\n")
+
+    while True:
+        print("Фігура")
+        print("1.Пішак")
+        print("2.Король")
+        print("3.Кінь")
+        print("4.Офіцер")
+        print("5.Ладья")
+        print("6.Королева")
+        print("Будь - яке слово - вихід")
+        try:
+            your_choice = int(input("Зроби свій вибір: "))
+        except ValueError:
+            break
+        print(f"Вы ввели: {your_choice}")
+        x = int(input("Введи початкову х: "))
+        y = int(input("Введи початкову у: "))
+        print("Кольор")
+        print("0. Чорний")
+        print("1. Білий")
+        color = bool(int(input("- ")))
+        print("\n")
+        figure = Figure()
+
+        match your_choice:
+            case 1:
+                figure = Pawn((x, y), color)
+            case 2:
+                figure = King((x, y), color)
+            case 3:
+                figure = Knight((x, y), color)
+            case 4:
+                figure = Bishop((x, y), color)
+            case 5:
+                figure = Rook((x, y), color)
+            case 6:
+                figure = Queen((x, y), color)
+            case 0:
+                break
+            case _:
+                print("Ваш выбор не входит в диапазон")
+        while True:
+            print(figure.info())
+            print("Куди?")
+            x = int(input("Введи х: "))
+            y = int(input("Введи у: "))
+            if figure.is_possible_move((x, y)):
+                figure.change_position((x, y))
+                print("Пішли\n")
+            else:
+                print("Не можна!\n")
+
+    print("\nПрограма закінчила роботу. До зустрічі!\n")
 #################################
 #         Кінець роботи         #
 #    основного циклу програми   #
