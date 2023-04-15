@@ -2,7 +2,7 @@
 # Блок підключення бібліотек #
 ##############################
 # -*- coding: utf-8 -*-
-from BaseFigure import Figure
+from base_figure import Figure
 from typing import Tuple
 
 
@@ -15,82 +15,84 @@ from typing import Tuple
 #  Блок реалізації класів #
 ###########################
 class Pawn(Figure):
-    _name = "Pawn"
-    # if direction = 1 down->up elif direction = -1 up->down else - error
-    __direction: int = 1
-    __is_first_move: bool = True
-
-    def __init__(self, position: Tuple[int, int] = (0, 0), color: bool = True):
-        super().__init__(position, color)
-        self.__direction = self._get_direction(color)
-        self.__is_first_move = True
+    def __init__(self, position: Tuple[int, int] = (0, 0), color_: bool = True):
+        super().__init__(position, color_)
+        # if direction = 1 down->up elif direction = -1 up->down else - error
+        self._direction = self._get_direction(color_)
+        self._first_move = True
 
     def change_color(self):
         super().change_color()
-        self.__direction *= -1
+        self._direction *= -1
 
     @staticmethod
-    def _get_direction(color: bool) -> int:
-        if color:
+    def _get_direction(color_: bool) -> int:
+        if color_:
             return 1
         else:
             return -1
+
     def direction(self):
-        if self.__direction > 0:
+        if self._direction > 0:
             return "Up"
         else:
             return "Down"
+
     def change_position(self, position: Tuple[int, int]):
         super().change_position(position)
-        if self.__is_first_move:
-            self.__is_first_move = False
+        if self._first_move:
+            self._first_move = False
 
-    def is_possible_move(self, position: Tuple[int, int]) -> bool:
-        super().is_possible_move(position)
-        return position[0] == self.get_x() + self.__direction \
-            and self.get_y() == position[1] or position[0] == self.get_x() \
-            + (self.__direction * 2) and self.get_y() == position[1] \
-            and self.__is_first_move
+    def can_move(self, position: Tuple[int, int]) -> bool:
+        super().can_move(position)
+        delta_x, delta_y = self.get_delta(position)
+        if self._first_move and delta_x == self._direction * 2:
+            return True
+        if delta_x != self._direction:
+            return False
+        if delta_y:
+            return False
+        return True
 
     def info(self):
         return super().info() + f"\ndirection = {self.direction()}\n" \
-                                f"is first move = {self.__is_first_move}"
+                                f"is first move = {self._first_move}"
 
 
 class King(Figure):
-    def is_possible_move(self, position: Tuple[int, int]) -> bool:
-        super().is_possible_move(position)
-        return abs(position[0] - self.get_x()) <= 1\
-            and abs(position[1] - self.get_y()) <= 1
+    def can_move(self, position: Tuple[int, int]) -> bool:
+        super().can_move(position)
+        delta_x, delta_y = self.get_delta_abs(position)
+        return delta_x <= 1 and delta_y <= 1
 
 
 class Knight(Figure):
-    def is_possible_move(self, position: Tuple[int, int]) -> bool:
-        super().is_possible_move(position)
-        return abs(position[0] - self.get_x()) == 2\
-            and abs(position[1] - self.get_y()) == 1\
-            or abs(position[0] - self.get_x()) == 1\
-            and abs(position[1] - self.get_y()) == 2
+    def can_move(self, position: Tuple[int, int]) -> bool:
+        super().can_move(position)
+        delta_x, delta_y = self.get_delta_abs(position)
+        return delta_x == 2 and delta_y == 1 \
+            or delta_x == 1 and delta_y == 2
 
 
 class Bishop(Figure):
-    def is_possible_move(self, position: Tuple[int, int]) -> bool:
-        super().is_possible_move(position)
-        return abs(position[0] - self.get_x())\
-            == abs(position[1] - self.get_y())
+    def can_move(self, position: Tuple[int, int]) -> bool:
+        super().can_move(position)
+        delta_x, delta_y = self.get_delta_abs(position)
+        return delta_x == delta_y
 
 
 class Rook(Figure):
-    def is_possible_move(self, position: Tuple[int, int]) -> bool:
-        super().is_possible_move(position)
-        return abs(position[0] - self.get_x()) == 0\
-            or abs(position[1] - self.get_y()) == 0
+    def can_move(self, position: Tuple[int, int]) -> bool:
+        super().can_move(position)
+        delta_x, delta_y = self.get_delta_abs(position)
+        return delta_x == 0 or delta_y == 0
 
 
 class Queen(Rook, Bishop):
-    def is_possible_move(self, position: Tuple[int, int]) -> bool:
-        return Rook.is_possible_move(self, position)\
-            or Bishop.is_possible_move(self, position)
+    def can_move(self, position: Tuple[int, int]) -> bool:
+        return Rook.can_move(self, position) \
+            or Bishop.can_move(self, position)
+
 
 ###########################
 #       Кінець блоку      #
@@ -101,13 +103,7 @@ class Queen(Rook, Bishop):
 # Блок реалізації функцій #
 ###########################
 def checker(lst: list, pos: Tuple[int, int]):
-    temp_lst = []
-    for i in lst:
-        if not isinstance(i, Figure):
-            continue
-        if i.is_possible_move(pos):
-            temp_lst.append(i)
-    return temp_lst
+    return [i for i in lst if i.can_move(pos)]
 
 
 ###########################
@@ -121,12 +117,12 @@ def checker(lst: list, pos: Tuple[int, int]):
 if __name__ == "__main__":
 
     li_fig = [
-        Pawn((5, 4), 0),
+        Pawn((5, 4), False),
         King((3, 3)),
         Bishop((0, 0)),
         Rook((0, 4)),
         Queen((4, 0)),
-        Pawn((0, 4), 1),
+        Pawn((0, 4), True),
         King((1, 3)),
     ]
     print(li_fig)
@@ -178,7 +174,7 @@ if __name__ == "__main__":
             print("Куди?")
             x = int(input("Введи х: "))
             y = int(input("Введи у: "))
-            if figure.is_possible_move((x, y)):
+            if figure.can_move((x, y)):
                 figure.change_position((x, y))
                 print("Пішли\n")
             else:
